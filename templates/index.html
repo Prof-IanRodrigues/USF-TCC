@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Citações ABNT</title>
+</head>
+<body>
+    <h2>Gerador de Citações ABNT</h2>
+    <form method="post">
+        <label>Autor (SOBRENOME, Nome):</label>
+        <input type="text" name="autor" required><br><br>
+
+        <label>Título da Obra:</label>
+        <input type="text" name="titulo" required><br><br>
+
+        <label>Edição:</label>
+        <input type="text" name="edicao" required><br><br>
+
+        <label>Ano:</label>
+        <select name="ano">
+            {% for ano in range(2025, 1899, -1) %}
+                <option value="{{ ano }}">{{ ano }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label>Editora:</label>
+        <input type="text" name="editora" required><br><br>
+
+        <label>Local (Cidade):</label>
+        <input type="text" name="local" required><br><br>
+
+        <label>Páginas:</label>
+        <input type="text" name="paginas" required><br><br>
+
+        <label>Relevância:</label>
+        <select name="relevancia">
+            <option value="Alta">Alta</option>
+            <option value="Média">Média</option>
+            <option value="Baixa">Baixa</option>
+        </select><br><br>
+
+        <button type="submit">Gerar Referência</button>
+    </form>
+
+    {% if referencia %}
+        <h3>Referência ABNT Gerada:</h3>
+        <p>{{ referencia | safe }}</p>
+    {% endif %}
+</body>
+</html>
