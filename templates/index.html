@@ -3,49 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Citações ABNT</title>
+    <title>Organizador de Referências</title>
+    <!-- Adicionar Bootstrap para facilitar o design responsivo -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        function logout() {
+            // Limpa os dados armazenados
+            localStorage.clear();
+            sessionStorage.clear();
+        }
+    </script>
+
+    <script>
+        function mostrarCampos() {
+            let tipo = document.getElementById("tipo").value;
+            let campos = document.querySelectorAll(".campo");
+            campos.forEach(campo => campo.style.display = "none");
+
+            document.getElementById("campo-sobrenomeautor").style.display = "block";
+            document.getElementById("campo-prenomeautor").style.display = "block";
+            document.getElementById("campo-titulo").style.display = "block";
+            document.getElementById("campo-ano").style.display = "block";
+            document.getElementById("campo-citacao").style.display = "block";
+            document.getElementById("campo-secao").style.display = "block";
+            
+            if (tipo === "Livro") {
+                document.getElementById("campo-edicao").style.display = "block";
+                document.getElementById("campo-local").style.display = "block";
+                document.getElementById("campo-editora").style.display = "block";
+                document.getElementById("campo-paginas").style.display = "block";
+            } else if (["Tese", "Dissertação", "TCC"].includes(tipo)) {
+                document.getElementById("campo-grau").style.display = "block";
+                document.getElementById("campo-instituicao").style.display = "block";
+                document.getElementById("campo-universidade").style.display = "block";
+                document.getElementById("campo-local").style.display = "block";
+                document.getElementById("campo-paginas").style.display = "block";
+            } else if (tipo === "Artigo de Periódico") {
+                document.getElementById("campo-edicao").style.display = "block";
+                document.getElementById("campo-local").style.display = "block";
+                document.getElementById("campo-editora").style.display = "block";
+                document.getElementById("campo-volume").style.display = "block";
+                document.getElementById("campo-numero").style.display = "block";
+                document.getElementById("campo-paginas").style.display = "block";
+                document.getElementById("campo-mes").style.display = "block";
+                document.getElementById("campo-link").style.display = "block";
+                document.getElementById("campo-data-acesso").style.display = "block";
+            } else if (tipo.includes("Referência Legislativa")) {
+                document.getElementById("campo-local").style.display = "block";
+                document.getElementById("campo-editora").style.display = "block";
+                document.getElementById("campo-volume").style.display = "block";
+                document.getElementById("campo-numero").style.display = "block";
+                document.getElementById("campo-paginas").style.display = "block";
+                document.getElementById("campo-mes").style.display = "block";
+                document.getElementById("campo-link").style.display = "block";
+                document.getElementById("campo-data-acesso").style.display = "block";
+            } else if (tipo === "Texto na Internet") {
+                document.getElementById("campo-local").style.display = "block";
+                document.getElementById("campo-editora").style.display = "block";
+                document.getElementById("campo-paginas").style.display = "block";
+                document.getElementById("campo-link").style.display = "block";
+                document.getElementById("campo-data-acesso").style.display = "block";
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .logout-button {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .logout-button:hover {
+            background-color: #c9302c;
+        }
+        
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        p{
+            text-align: center;
+            font-size: 12px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .referencias-lista {
+            margin-top: 30px;
+        }
+
+        .referencia {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .referencia p {
+            margin: 0;
+            color: #333;
+        }
+
+    </style>
+
+
+    
 </head>
 <body>
-    <h2>Gerador de Citações ABNT</h2>
-    <form method="post">
-        <label>Autor (SOBRENOME, Nome):</label>
-        <input type="text" name="autor" required><br><br>
+    <h1>Organizador de Referências</h1>
+    <p>Criado com muito carinho pelo Professor Ian ;)</p>
 
-        <label>Título da Obra:</label>
-        <input type="text" name="titulo" required><br><br>
+    <form action="{{ url_for('logout') }}" method="POST">
+        <button type="submit" class="logout-button">Logout</button>
+    </form>
+    
+    <form method="POST">
+        <label for="tipo">Tipo de Referência:</label>
+        <select id="tipo" name="tipo" onchange="mostrarCampos()">
+            <option value="">Selecione...</option>
+            <option value="Livro">Livro</option>
+            <option value="Tese">Tese</option>
+            <option value="Dissertação">Dissertação</option>
+            <option value="TCC">Trabalho de Conclusão de Curso</option>
+            <option value="Artigo de Periódico">Artigo de Periódico</option>
+            <option value="Referência Legislativa (Lei)">Referência Legislativa (Lei)</option>
+            <option value="Referência Legislativa (Portaria/Resolução)">Referência Legislativa (Portaria/Resolução)</option>
+            <option value="Texto na Internet">Texto na Internet</option>
+        </select>
 
-        <label>Edição:</label>
-        <input type="text" name="edicao" required><br><br>
+        <div id="campo-sobrenomeautor" class="campo">
+            <label for="autor">Sobrenome do Autor:</label>
+            <input type="text" id="sobrenomeautor" name="sobrenomeautor">
+        </div>
 
-        <label>Ano:</label>
-        <select name="ano">
-            {% for ano in range(2025, 1899, -1) %}
-                <option value="{{ ano }}">{{ ano }}</option>
-            {% endfor %}
-        </select><br><br>
+        <div id="campo-prenomeautor" class="campo">
+            <label for="autor">Nomes do Autor:</label>
+            <input type="text" id="prenomeautor" name="prenomeautor">
+        </div>
+        
+        <div id="campo-titulo" class="campo">
+            <label for="titulo">Título:</label>
+            <input type="text" id="titulo" name="titulo">
+        </div>
 
-        <label>Editora:</label>
-        <input type="text" name="editora" required><br><br>
+        <div id="campo-edicao" class="campo">
+            <label for="edicao">Edição:</label>
+            <select id="edicao" name="edicao">
+                <option value="">Selecione...</option>
+                {% for i in range(1, 100) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-        <label>Local (Cidade):</label>
-        <input type="text" name="local" required><br><br>
+        <div id="campo-local" class="campo">
+            <label for="local">Local:</label>
+            <input type="text" id="local" name="local">
+        </div>
 
-        <label>Páginas:</label>
-        <input type="text" name="paginas" required><br><br>
+        <div id="campo-editora" class="campo">
+            <label for="editora">Editora:</label>
+            <input type="text" id="editora" name="editora">
+        </div>
 
-        <label>Relevância:</label>
-        <select name="relevancia">
-            <option value="Alta">Alta</option>
-            <option value="Média">Média</option>
-            <option value="Baixa">Baixa</option>
-        </select><br><br>
+        <div id="campo-ano" class="campo">
+            <label for="ano">Ano:</label>
+            <select id="ano" name="ano">
+                <option value="">Selecione o ano</option>
+                {% for ano in range(2025, 1899, -1) %}
+                    <option value="{{ ano }}">{{ ano }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="campo-paginas" class="campo">
+            <label for="paginas">Número de páginas:</label>
+            <input type="text" id="paginas" name="paginas">
+        </div>
+
+        <div id="campo-volume" class="campo">
+            <label for="volume">Volume:</label>
+            <input type="text" id="volume" name="volume">
+        </div>
+
+        <div id="campo-numero" class="campo">
+            <label for="numero">Número:</label>
+            <input type="text" id="numero" name="numero">
+        </div>
+
+        <div id="campo-mes" class="campo">
+            <label for="mes">Mês:</label>
+            <input type="text" id="mes" name="mes">
+        </div>
+
+        <div id="campo-link" class="campo">
+            <label for="link">Link:</label>
+            <input type="text" id="link" name="link">
+        </div>
+
+        <div id="campo-data-acesso" class="campo">
+            <label for="data_acesso">Data de Acesso:</label>
+            <input type="date" id="data_acesso" name="data_acesso" min="2023-01-01" max="2025-06-01">
+        </div>
+
+        <div id="campo-instituicao" class="campo">
+            <label for="instituicao">Instituição:</label>
+            <input type="text" id="instituicao" name="instituicao">
+        </div>
+
+        <div id="campo-universidade" class="campo">
+            <label for="universidade">Universidade:</label>
+            <input type="text" id="universidade" name="universidade">
+        </div>
+
+        <div id="campo-grau" class="campo">
+            <label for="grau">Grau Acadêmico:</label>
+            <input type="text" id="grau" name="grau">
+        </div>
+
+        <div id="campo-citacao" class="campo">
+            <label for="citacao">Trecho da Citação:</label>
+            <textarea id="citacao" name="citacao" rows="4" placeholder="Cole aqui a citação que deseja referenciar"></textarea>
+        </div>
+
+        <div id="campo-secao" class="campo">
+            <label for="secao">Seção onde será usada:</label>
+            <input type="text" id="secao" name="secao" placeholder="Informe a seção do seu texto">
+        </div>
 
         <button type="submit">Gerar Referência</button>
     </form>
 
-    {% if referencia %}
-        <h3>Referência ABNT Gerada:</h3>
-        <p>{{ referencia | safe }}</p>
-    {% endif %}
+    <h2>Referências Geradas:</h2>
+    <div id="resultado" class="mt-4">
+        <ul>
+        {% for referencia in referencias %}
+            <li>{{ referencia | safe }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+
+    <form action="/download" method="POST">
+        <button type="submit">Baixar PDF</button>
+    </form>
+
+
+    <h4>Lembre-se de fazer o Logout!</h4>
 </body>
 </html>
